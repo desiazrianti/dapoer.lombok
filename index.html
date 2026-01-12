@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Dapoer Lombok | Makanan Khas Lombok</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+.dashboard{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  text-align:center;
+  min-height:100vh;
+  background:
+    linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,.6)),
+    url("background.jpg") center/cover no-repeat;
+}
+
+.dash-box{
+  background:rgba(0,0,0,0.6);
+  padding:40px;
+  border-radius:20px;
+  max-width:500px;
+}
+
+.dash-info{
+  display:flex;
+  justify-content:space-around;
+  margin:20px 0;
+}
+
+.dash-btn{
+  font-size:18px;
+  padding:12px 25px;
+}
+
+.modal-content{
+  position: relative; /* ← INI PENTING */
+}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:url("images/background.jpg") center/cover fixed no-repeat;
+}
+.progress{
+  width:100%;
+  height:10px;
+  background:#eee;
+  border-radius:10px;
+  overflow:hidden;
+  margin-bottom:10px;
+}
+
+.progress-bar{
+  height:100%;
+  width:0%;
+  background:#4caf50;
+  transition:0.4s;
+}
+
+/* HEADER */
+header{
+  padding:30px 0;
+  background:rgba(0,0,0,0.5);
+  text-align:center;
+  color:white;
+  display:flex;
+  justify-content:center;
+}
+
+header .header-inner{
+  width:100%;
+  max-width:1200px;
+}
+
+header h1{
+  margin:0;
+  font-size:38px;
+}
+
+
+/* NAVBAR */
+nav{
+  background:rgba(0,0,0,0.8);
+  padding:12px;
+
+}
+nav a{
+  color:white;
+  text-decoration:none;
+  margin-right:15px;
+  font-weight:bold;
+}
+/* ICON KERANJANG */
+.cart-icon{
+  float:right;
+  font-size:30px;
+  cursor:pointer;
+  color:#ffcc00;
+}
+.cart-icon:hover{
+  color:white;
+}
+#jumlahItem{
+  background:red;
+  color:white;
+  border-radius:50%;
+  padding:2px 6px;
+  font-size:14px;
+  position:relative;
+  top:-10px;
+}
+
+/* CONTAINER */
+.container{
+  background:rgba(255,255,255,0.95);
+  margin:20px;
+  padding:25px;
+  border-radius:12px;
+}
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+
+/* CARD */
+.card{
+  background:white;
+  border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.2);
+  text-align:center;
+  padding-bottom:10px;
+}
+.card img{
+  width:100%;
+  height:160px;
+  object-fit:contain;
+}
+.price{
+  color:#b71c1c;
+  font-weight:bold;
+}
+
+/* BUTTON */
+.btn{
+  background:#b71c1c;
+  color:white;
+  border:none;
+  padding:8px 15px;
+  border-radius:6px;
+  cursor:pointer;
+  margin-bottom:10px;
+}
+
+/* CART */
+.popup-cart{
+  display:none;
+  position:fixed;
+  top:90px;
+  right:20px;
+  width:340px;
+  background:white;
+  padding:15px;
+  border-radius:12px;
+  z-index:999;
+}
+.popup-cart ul{
+  list-style:none;
+  padding:0;
+}
+.qty-btn{
+  padding:2px 6px;
+  margin:0 4px;
+}
+
+/* SOSMED */
+.sosmed a{
+  display:inline-block;
+  margin-right:25px;
+  text-decoration:none;
+  color:#333;
+  text-align:center;
+}
+.sosmed i{
+  font-size:28px;
+  display:block;
+}
+
+/* FOOTER */
+footer{
+  background:#000;
+  color:white;
+  text-align:center;
+  padding:15px;
+}
+/* ===== RATING BINTANG ===== */
+.rating {
+  margin: 6px 0;
+}
+
+.rating i {
+  color: #ccc;            /* warna awal abu */
+  cursor: pointer;
+  font-size: 18px;
+  transition: color 0.2s;
+}
+
+.rating i.active {
+  color: gold;            /* warna emas */
+}
+
+.rating i:hover {
+  color: gold;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>Dapoer Lombok</h1>
+    <p>Makanan & Minuman Khas Lombok</p>
+  </div>
+</header>
+
+<nav>
+<a href="#makanan">Makanan</a>
+<a href="#minuman">Minuman</a>
+<a href="#kontak">Kontak</a>
+
+<span class="cart-icon" onclick="toggleKeranjang()">
+  <i class="fas fa-shopping-cart"></i>
+  <span id="jumlahItem">0</span>
+</span>
+</nav>
+
+<!-- KERANJANG -->
+<div class="popup-cart" id="popupKeranjang">
+<h3>Keranjang Belanja</h3>
+<ul id="daftarKeranjang"></ul>
+
+<label>Metode Pembayaran:</label>
+<select id="pembayaran" style="width:100%;padding:6px">
+  <option value="COD">COD (Bayar di Tempat)</option>
+  <option value="Transfer">Transfer Bank</option>
+</select>
+
+<p><b>Total:</b> Rp <span id="totalHarga">0</span></p>
+<p>⏱ Estimasi Pengantaran: <b><span id="estimasi">-</span> menit</b></p>
+<p id="ongkirInfo">Belanja Rp 50.000 lagi untuk GRATIS ONGKIR</p>
+<div class="progress">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<button class="btn" onclick="checkout()">Pesan via WhatsApp</button>
+<button class="btn" onclick="toggleKeranjang()">Tutup</button>
+</div>
+
+<!-- MAKANAN -->
+<div class="container" id="makanan">
+<h2>Menu Makanan</h2>
+<input type="text" id="searchMenu" placeholder="Cari menu..."
+style="width:100%;padding:10px;margin-bottom:15px;border-radius:8px;border:1px solid #ccc"
+onkeyup="cariMenu()">
+
+<div class="products">
+
+<div class="card"><img src="images/ayam-taliwang.jpg"><h3>Ayam Taliwang</h3><div class="rating">
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+  </div><div class="price">Rp 45.000</div><button class="btn" onclick="tambahKeranjang('Ayam Taliwang',45000)">Pesan</button></div>
+
+<div class="card"><img src="images/plecing-kangkung.jpg"><h3>Plecing Kangkung</h3><div class="rating">
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+  </div><div class="price">Rp 15.000</div><button class="btn" onclick="tambahKeranjang('Plecing Kangkung',15000)">Pesan</button></div>
+
+<div class="card"><img src="images/sate-rembiga.jpg"><h3>Sate Rembiga</h3><div class="rating">
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+  </div><div class="price">Rp 30.000</div><button class="btn" onclick="tambahKeranjang('Sate Rembiga',30000)">Pesan</button></div>
+
+<div class="card"><img src="images/beberuk-terong.jpg"><h3>Beberuk Terong</h3><div class="rating">
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+  </div><div class="price">Rp 12.000</div><button class="btn" onclick="tambahKeranjang('Beberuk Terong',12000)">Pesan</button></div>
+
+<div class="card"><img src="images/bebalung.jpg"><h3>Bebalung</h3><div class="rating">
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+  </div><div class="price">Rp 35.000</div><button class="btn" onclick="tambahKeranjang('Bebalung',35000)">Pesan</button></div>
+
+<div class="card"><img src="images/poteng-jaje-tujak.jpg"><h3>Poteng Jaje Tujak</h3><div class="rating">
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+  </div><div class="price">Rp 15.000</div><button class="btn" onclick="tambahKeranjang('Poteng Jaje Tujak',15000)">Pesan</button></div>
+
+<div class="card"><img src="images/sate-bulayak.jpg"><h3>Sate Bulayak</h3><div class="rating">
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+  </div><div class="price">Rp 25.000</div><button class="btn" onclick="tambahKeranjang('Sate Bulayak',25000)">Pesan</button></div>
+
+</div>
+</div>
+
+<!-- MINUMAN -->
+<div class="container" id="minuman">
+<h2>Menu Minuman</h2>
+<div class="products">
+
+<div class="card"><img src="images/es-kelapa.jpg"><h3>Es Kelapa Muda</h3><div class="rating">
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+  </div><div class="price">Rp 10.000</div><button class="btn" onclick="tambahKeranjang('Es Kelapa Muda',10000)">Pesan</button></div>
+
+<div class="card"><img src="images/es-gula-aren.jpg"><h3>Es Gula Aren</h3><div class="rating">
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+  </div><div class="price">Rp 8.000</div><button class="btn" onclick="tambahKeranjang('Es Gula Aren',8000)">Pesan</button></div>
+
+<div class="card"><img src="images/es-jeruk.jpg"><h3>Es Jeruk Lombok</h3><div class="rating">
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+  </div><div class="price">Rp 8.000</div><button class="btn" onclick="tambahKeranjang('Es Jeruk Lombok',8000)">Pesan</button></div>
+
+<div class="card"><img src="images/teh-panas.jpg"><h3>Teh Panas</h3><div class="rating">
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+    <i class="fas fa-star" onclick="rate(this)"></i>
+  </div><div class="price">Rp 5.000</div><button class="btn" onclick="tambahKeranjang('Teh Panas',5000)">Pesan</button></div>
+</div>
+</div>
+
+<!-- KONTAK -->
+<div class="container" id="kontak">
+<h2>Kontak Kami</h2>
+<p>📍 Lombok, NTB</p>
+<p>📱 WhatsApp: 0812-3456-7890</p>
+
+<div class="sosmed">
+<a href="#"><i class="fab fa-instagram"></i>@dapoer lombok</a>
+<a href="#"><i class="fab fa-tiktok"></i>@dapoer lombok</a>
+<a href="#"><i class="fab fa-facebook"></i>@dapoer lombok</a>
+</div>
+</div>
+
+<footer>&copy; 2026 Dapoer Lombok</footer>
+
+<script>
+let keranjang=[];
+
+function tambahKeranjang(nama,harga){
+  let item=keranjang.find(i=>i.nama===nama);
+  if(item){item.qty++;}
+  else{keranjang.push({nama,harga,qty:1});}
+  update();
+}
+
+function update(){
+  let list=document.getElementById("daftarKeranjang");
+  let total=0;
+  list.innerHTML="";
+  keranjang.forEach((i,idx)=>{
+    total+=i.harga*i.qty;
+    list.innerHTML+=`
+    <li>
+    ${i.nama}<br>
+    <button class="qty-btn" onclick="ubahQty(${idx},-1)">-</button>
+    ${i.qty}
+    <button class="qty-btn" onclick="ubahQty(${idx},1)">+</button>
+    </li>`;
+  });
+  document.getElementById("totalHarga").textContent=total;
+  document.getElementById("jumlahItem").textContent=keranjang.length;
+}
+
+function ubahQty(i,n){
+  keranjang[i].qty+=n;
+  if(keranjang[i].qty<=0) keranjang.splice(i,1);
+  update();
+}
+
+function toggleKeranjang(){
+  let p=document.getElementById("popupKeranjang");
+  p.style.display=p.style.display==="block"?"none":"block";
+
+  // Estimasi ala GoFood
+  let estimasi = Math.floor(Math.random()*25)+20;
+  document.getElementById("estimasi").textContent = estimasi;
+}
+
+
+function checkout(){
+  if(keranjang.length===0){
+    alert("Keranjang masih kosong");
+    return;
+  }
+  let bayar=document.getElementById("pembayaran").value;
+  let pesan="Halo Dapoer Lombok, saya ingin memesan:%0A";
+  keranjang.forEach(i=>{
+    pesan+=`- ${i.nama} (${i.qty})%0A`;
+  });
+  pesan+=`Metode Pembayaran: ${bayar}`;
+  window.open("https://wa.me/6281234567890?text="+pesan,"_blank");
+}
+function cariMenu(){
+  let input=document.getElementById("searchMenu").value.toLowerCase();
+  let card=document.querySelectorAll(".card");
+  card.forEach(c=>{
+    let text=c.innerText.toLowerCase();
+    c.style.display=text.includes(input)?"block":"none";
+  });
+}
+
+/* ===== RATING BISA DIKLIK ===== */
+function rate(star) {
+  let stars = star.parentElement.querySelectorAll("i");
+  let index = Array.from(stars).indexOf(star);
+
+  stars.forEach((s, i) => {
+    if (i <= index) {
+      s.classList.add("active");
+    } else {
+      s.classList.remove("active");
+    }
+  });
+}
+function goMenu(){
+  document.getElementById("makanan").scrollIntoView({
+    behavior:"smooth"
+  });
+}
+
+
+
+</script>
+
+</body>
+</html>   perbaiki kode ini
